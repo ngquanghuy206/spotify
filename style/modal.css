@@ -1,0 +1,359 @@
+/* --- Now Playing Modal --- */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    z-index: 2000;
+    visibility: hidden;
+    opacity: 0;
+    display: flex;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.modal.active {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-bg {
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    width: 120%;
+    height: 120%;
+    background-size: cover;
+    background-position: center;
+    filter: blur(60px) brightness(0.4);
+    transition: background-image 0.8s ease;
+    z-index: 1;
+}
+
+.modal-content {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    padding: 60px 40px;
+    display: flex;
+    flex-direction: column;
+    z-index: 2;
+    overflow-y: auto; /* Allow scrolling entire modal content if needed */
+}
+
+.close-btn {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.scroll-top-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: var(--primary-color);
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    color: black;
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.scroll-top-btn.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.modal-body {
+    display: flex;
+    flex: 1;
+    gap: 80px;
+    align-items: center;
+    justify-content: center;
+    max-width: 1300px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Disc Styling */
+.modal-left {
+    flex: 1.5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    min-width: 0;
+}
+
+.disc-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.disc-container {
+    width: clamp(250px, 45vh, 450px);
+    height: clamp(250px, 45vh, 450px);
+    border-radius: 50%;
+    position: relative;
+    box-shadow: 0 20px 80px rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+    animation: rotate 15s linear infinite;
+    animation-play-state: paused;
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal.active .disc-container {
+    transform: scale(1) rotate(0deg);
+}
+
+.modal:not(.active) .disc-container {
+    transform: scale(0.6) rotate(-20deg);
+}
+
+.disc-container.playing {
+    animation-play-state: running;
+}
+
+.disc-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 8px solid #111;
+}
+
+.disc-center {
+    position: absolute;
+    width: 12%;
+    height: 12%;
+    background: #000;
+    border-radius: 50%;
+    border: 4px solid #222;
+    z-index: 2;
+    box-shadow: inset 0 0 10px rgba(255,255,255,0.1);
+}
+
+.modal-track-info {
+    text-align: center;
+    width: 100%;
+}
+
+.modal-track-info h2 {
+    font-size: clamp(24px, 4vw, 40px);
+    font-weight: 800;
+    margin-bottom: 12px;
+    letter-spacing: -1px;
+    text-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.modal-track-info p {
+    font-size: clamp(16px, 1.5vw, 22px);
+    color: var(--text-muted);
+    margin-bottom: 40px;
+    font-weight: 500;
+}
+
+/* Modal Player Controls */
+.modal-player-controls {
+    width: 100%;
+    max-width: 550px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 30px;
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+}
+
+.modal-player-controls .control-buttons {
+    gap: 40px;
+}
+
+.modal-player-controls .btn-play {
+    width: 72px;
+    height: 72px;
+    background-color: white;
+    filter: drop-shadow(0 4px 10px rgba(255,255,255,0.2));
+}
+
+.modal-player-controls .btn-play i {
+    font-size: 28px;
+    color: black;
+}
+
+.modal-player-controls .progress-bar-container {
+    width: 100%;
+    gap: 20px;
+}
+
+.modal-player-controls .progress-bar {
+    flex: 1;
+    height: 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    position: relative;
+    cursor: pointer;
+}
+
+.modal-player-controls .progress-filled {
+    height: 100%;
+    background: var(--primary-color);
+    border-radius: 4px;
+    width: 0;
+}
+
+.modal-player-controls span {
+    font-size: 14px;
+    color: var(--text-muted);
+    min-width: 45px;
+}
+
+/* Queue Styling */
+.modal-right {
+    flex: 1;
+    max-width: 400px;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 30px;
+    height: 70vh;
+    max-height: 700px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+}
+
+.modal-right h3 {
+    margin-bottom: 25px;
+    font-size: 22px;
+    font-weight: 700;
+    color: white;
+}
+
+.queue-list {
+    overflow-y: auto;
+    flex: 1;
+    padding-right: 10px;
+}
+
+.queue-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 4px;
+}
+
+.queue-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(8px);
+}
+
+.queue-item img {
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.q-info .q-title {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.q-info .q-artist {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Interaction for opening modal */
+.player-bar {
+    cursor: pointer;
+}
+
+/* Responsive Modal */
+@media (max-width: 1000px) {
+    .modal-content {
+        padding: 60px 20px 20px;
+    }
+    .modal-body {
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 40px;
+    }
+    .modal-right {
+        width: 100%;
+        max-width: 500px;
+        height: auto;
+        min-height: 300px;
+        margin-bottom: 40px;
+        flex: none;
+    }
+    .modal-left {
+        flex: none;
+        width: 100%;
+    }
+}
+
+@media (max-height: 800px) {
+    .disc-container {
+        width: clamp(200px, 35vh, 300px);
+        height: clamp(200px, 35vh, 300px);
+    }
+}
